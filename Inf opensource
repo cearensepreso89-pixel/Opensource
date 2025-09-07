@@ -1,0 +1,88 @@
+-- // Criar ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+-- // Botão de abrir/fechar
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 120, 0, 40)
+ToggleButton.Position = UDim2.new(0, 20, 0, 200)
+ToggleButton.Text = "📂 Abrir Menu"
+ToggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Parent = ScreenGui
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.TextSize = 18
+ToggleButton.AutoButtonColor = true
+ToggleButton.BackgroundTransparency = 0.1
+ToggleButton.BorderSizePixel = 0
+ToggleButton.ZIndex = 2
+
+-- // Frame principal (menu)
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 220, 0, 200)
+MainFrame.Position = UDim2.new(0, 20, 0, 250)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+MainFrame.BorderSizePixel = 0
+
+-- // Título
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Title.Text = "⚙️ Menu Spawn Towers"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 18
+Title.Parent = MainFrame
+Title.BorderSizePixel = 0
+
+-- Função pra criar botões automaticamente
+local function CreateButton(text, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -20, 0, 40)
+    btn.Position = UDim2.new(0, 10, 0, (#MainFrame:GetChildren() - 1) * 45)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 16
+    btn.Text = text
+    btn.Parent = MainFrame
+    btn.AutoButtonColor = true
+    btn.BorderSizePixel = 0
+
+    btn.MouseButton1Click:Connect(callback)
+end
+
+-- // Botões com scripts que você passou
+CreateButton("Large Laser Cameraguy", function()
+    game:GetService("ReplicatedStorage").Functions.SpawnTower:InvokeServer(
+        "Large Large Cameraguy",
+        CFrame.new(game.Players.LocalPlayer.Character.Head.Position)
+    )
+end)
+
+CreateButton("The Corruption", function()
+    game:GetService("ReplicatedStorage").Functions.SpawnTower:InvokeServer(
+        "The Corruption",
+        CFrame.new(game.Players.LocalPlayer.Character.Head.Position)
+    )
+end)
+
+CreateButton("Corrupted Upgraded Titan Speakerguy", function()
+    game:GetService("ReplicatedStorage").Functions.SpawnTower:InvokeServer(
+        "Corrupted Upgraded Titan Speakerguy",
+        CFrame.new(game.Players.LocalPlayer.Character.Head.Position)
+    )
+end)
+
+-- // Sistema abrir/fechar menu
+local aberto = false
+ToggleButton.MouseButton1Click:Connect(function()
+    aberto = not aberto
+    MainFrame.Visible = aberto
+    ToggleButton.Text = aberto and "📂 Fechar Menu" or "📂 Abrir Menu"
+end)

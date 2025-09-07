@@ -1,0 +1,179 @@
+-- // Criar ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+-- // Fundo espacial animado
+local Background = Instance.new("ImageLabel")
+Background.Size = UDim2.new(1, 0, 1, 0)
+Background.Position = UDim2.new(0, 0, 0, 0)
+Background.Image = "rbxassetid://5553946656" -- textura de espaço
+Background.ScaleType = Enum.ScaleType.Tile
+Background.TileSize = UDim2.new(0, 300, 0, 300)
+Background.BackgroundTransparency = 1
+Background.ZIndex = 0
+Background.Parent = ScreenGui
+
+-- Animação do fundo (rolagem infinita)
+task.spawn(function()
+    local offset = 0
+    while task.wait(0.02) do
+        offset += 0.002
+        Background.Position = UDim2.new(offset % 1, 0, offset % 1, 0)
+    end
+end)
+
+-- // Botão de abrir/fechar
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 160, 0, 45)
+ToggleButton.Position = UDim2.new(0, 20, 0, 200)
+ToggleButton.Text = "📂 Abrir Menu"
+ToggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.TextSize = 18
+ToggleButton.AutoButtonColor = true
+ToggleButton.BackgroundTransparency = 0.05
+ToggleButton.BorderSizePixel = 0
+ToggleButton.ZIndex = 2
+ToggleButton.Parent = ScreenGui
+
+Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(0, 10)
+local strokeBtn = Instance.new("UIStroke", ToggleButton)
+strokeBtn.Color = Color3.fromRGB(0, 200, 255)
+strokeBtn.Thickness = 2
+
+-- // Frame principal (menu)
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 270, 0, 0) -- começa fechado
+MainFrame.Position = UDim2.new(0, 20, 0, 260)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BackgroundTransparency = 0.15
+MainFrame.Visible = false
+MainFrame.ClipsDescendants = true
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.BorderSizePixel = 0
+MainFrame.ZIndex = 2
+MainFrame.Parent = ScreenGui
+
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
+local stroke = Instance.new("UIStroke", MainFrame)
+stroke.Color = Color3.fromRGB(0, 200, 255)
+stroke.Thickness = 2
+
+-- // Título principal (Made By Dex)
+local MainTitle = Instance.new("TextLabel")
+MainTitle.Size = UDim2.new(1, 0, 0, 40)
+MainTitle.BackgroundTransparency = 1
+MainTitle.Text = "🌌 Made By Dex 🌌"
+MainTitle.TextColor3 = Color3.fromRGB(0, 200, 255)
+MainTitle.Font = Enum.Font.Fantasy
+MainTitle.TextSize = 24
+MainTitle.Parent = MainFrame
+
+-- // Subtítulo
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Position = UDim2.new(0, 0, 0, 40)
+Title.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+Title.Text = "⚙️ Menu Spawn Towers"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 18
+Title.BorderSizePixel = 0
+Title.Parent = MainFrame
+Instance.new("UICorner", Title).CornerRadius = UDim.new(0, 12)
+
+-- Layout dos botões
+local Layout = Instance.new("UIListLayout", MainFrame)
+Layout.Padding = UDim.new(0, 8)
+Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+Layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local Padding = Instance.new("UIPadding", MainFrame)
+Padding.PaddingTop = UDim.new(0, 80)
+Padding.PaddingLeft = UDim.new(0, 10)
+Padding.PaddingRight = UDim.new(0, 10)
+Padding.PaddingBottom = UDim.new(0, 10)
+
+-- Função para criar botões
+local function CreateButton(text, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -20, 0, 40)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 16
+    btn.Text = text
+    btn.AutoButtonColor = true
+    btn.BorderSizePixel = 0
+    btn.ZIndex = 3
+    btn.Parent = MainFrame
+
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    local stroke = Instance.new("UIStroke", btn)
+    stroke.Color = Color3.fromRGB(100, 100, 100)
+    stroke.Thickness = 1.5
+
+    -- efeito hover
+    btn.MouseEnter:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    end)
+    btn.MouseLeave:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    end)
+
+    -- efeito clique
+    btn.MouseButton1Click:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        task.delay(0.15, function()
+            btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        end)
+        callback()
+    end)
+end
+
+-- // Botões com scripts
+CreateButton("Large Laser Cameraguy", function()
+    game:GetService("ReplicatedStorage").Functions.SpawnTower:InvokeServer(
+        "Large Large Cameraguy",
+        CFrame.new(game.Players.LocalPlayer.Character.Head.Position)
+    )
+end)
+
+CreateButton("The Corruption", function()
+    game:GetService("ReplicatedStorage").Functions.SpawnTower:InvokeServer(
+        "The Corruption",
+        CFrame.new(game.Players.LocalPlayer.Character.Head.Position)
+    )
+end)
+
+CreateButton("Corrupted Upgraded Titan Speakerguy", function()
+    game:GetService("ReplicatedStorage").Functions.SpawnTower:InvokeServer(
+        "Corrupted Upgraded Titan Speakerguy",
+        CFrame.new(game.Players.LocalPlayer.Character.Head.Position)
+    )
+end)
+
+-- // Sistema abrir/fechar com animação
+local TweenService = game:GetService("TweenService")
+local aberto = false
+ToggleButton.MouseButton1Click:Connect(function()
+    aberto = not aberto
+    ToggleButton.Text = aberto and "📂 Fechar Menu" or "📂 Abrir Menu"
+
+    if aberto then
+        MainFrame.Visible = true
+        TweenService:Create(MainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 270, 0, 260)
+        }):Play()
+    else
+        local tween = TweenService:Create(MainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 270, 0, 0)
+        })
+        tween:Play()
+        tween.Completed:Wait()
+        MainFrame.Visible = false
+    end
+end)

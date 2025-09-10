@@ -1,0 +1,281 @@
+-- // Serviços
+local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+
+-- // Criar ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+-- // Botão abrir/fechar
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 150, 0, 45)
+ToggleButton.Position = UDim2.new(0, 30, 0, 200)
+ToggleButton.Text = "📂 Abrir Menu"
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 18
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Parent = ScreenGui
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+
+-- Rainbow no texto do botão
+task.spawn(function()
+    local t = 0
+    while task.wait(0.05) do
+        t += 0.02
+        local r = math.sin(t) * 127 + 128
+        local g = math.sin(t + 2) * 127 + 128
+        local b = math.sin(t + 4) * 127 + 128
+        ToggleButton.TextColor3 = Color3.fromRGB(r, g, b)
+    end
+end)
+
+-- // Frame principal
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 340, 0, 0)
+MainFrame.Position = UDim2.new(0, 30, 0, 260)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+MainFrame.Visible = false
+MainFrame.Transparency = 1
+MainFrame.Parent = ScreenGui
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
+
+-- UIStroke
+local UIStroke = Instance.new("UIStroke", MainFrame)
+UIStroke.Thickness = 2
+UIStroke.Color = Color3.fromRGB(120, 150, 255)
+UIStroke.Transparency = 0.4
+
+-- Fundo galáxia
+local Galaxy = Instance.new("ImageLabel")
+Galaxy.Size = UDim2.new(1, 0, 1, 0)
+Galaxy.BackgroundTransparency = 1
+Galaxy.Image = "rbxassetid://9419831037"
+Galaxy.ImageTransparency = 0.3
+Galaxy.ZIndex = 0
+Galaxy.Parent = MainFrame
+task.spawn(function()
+    while task.wait(0.05) do
+        Galaxy.Rotation = Galaxy.Rotation + 0.05
+    end
+end)
+
+-- Título
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundTransparency = 1
+Title.Text = "✨ Made By Dex ✨"
+Title.TextColor3 = Color3.fromRGB(0, 200, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 22
+Title.TextStrokeTransparency = 0.5
+Title.Parent = MainFrame
+
+-- Efeito neon no título
+task.spawn(function()
+    local t = 0
+    while task.wait(0.05) do
+        t += 0.05
+        local glow = math.sin(t) * 55 + 200
+        Title.TextColor3 = Color3.fromRGB(0, glow, 255)
+    end
+end)
+
+-- // Sistema de abas
+local TabButtonsFrame = Instance.new("Frame")
+TabButtonsFrame.Size = UDim2.new(1, -20, 0, 35)
+TabButtonsFrame.Position = UDim2.new(0, 10, 0, 45)
+TabButtonsFrame.BackgroundTransparency = 1
+TabButtonsFrame.Parent = MainFrame
+
+-- Layout das abas
+local TabLayout = Instance.new("UIListLayout", TabButtonsFrame)
+TabLayout.FillDirection = Enum.FillDirection.Horizontal
+TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+TabLayout.Padding = UDim.new(0, 5)
+
+local Tabs = {}
+local ActiveTab = nil
+
+local function CreateTab(name)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 100, 1, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Text = name
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    btn.BorderSizePixel = 0
+    btn.Parent = TabButtonsFrame
+
+    local frame = Instance.new("ScrollingFrame")
+    frame.Size = UDim2.new(1, -20, 1, -90)
+    frame.Position = UDim2.new(0, 10, 0, 85)
+    frame.BackgroundTransparency = 1
+    frame.Parent = MainFrame
+    frame.Visible = false
+    frame.CanvasSize = UDim2.new(0,0,0,0)
+    frame.ScrollBarThickness = 6
+
+    local list = Instance.new("UIListLayout", frame)
+    list.SortOrder = Enum.SortOrder.LayoutOrder
+    list.Padding = UDim.new(0, 5)
+
+    list.Changed:Connect(function()
+        frame.CanvasSize = UDim2.new(0, 0, 0, list.AbsoluteContentSize.Y + 10)
+    end)
+
+    Tabs[name] = {Button = btn, Frame = frame}
+
+    btn.MouseButton1Click:Connect(function()
+        for tabName, tab in pairs(Tabs) do
+            tab.Frame.Visible = false
+            tab.Button.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
+        end
+        ActiveTab = name
+        frame.Visible = true
+        btn.BackgroundColor3 = Color3.fromRGB(80, 80, 150)
+    end)
+
+    return frame
+end
+
+-- Criador de botões
+local function CreateButton(parent, text, unitName)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 90)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    btn.Text = text
+    btn.Parent = parent
+    btn.BorderSizePixel = 0
+
+    btn.MouseButton1Click:Connect(function()
+        ReplicatedStorage.Functions.SpawnTower:InvokeServer(unitName, CFrame.new(player.Character.Head.Position))
+    end)
+
+    btn.MouseEnter:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(80, 80, 120)
+    end)
+    btn.MouseLeave:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(50, 50, 90)
+    end)
+end
+
+-- // Criar as 3 abas
+local Aba1 = CreateTab("Aba 1")
+local Aba2 = CreateTab("Aba 2")
+local Aba3 = CreateTab("Aba 3")
+
+-- Aba 1
+CreateButton(Aba1, "Upgrade Titan Cameraman", "Upgrade Titan Cameraman")
+CreateButton(Aba1, "Demon Titan Tv man", "Demon Titan Tv man")
+CreateButton(Aba1, "Injured Upgrade Titan Cameraman", "Injured Upgrade Titan Cameraman")
+CreateButton(Aba1, "Coin Titan Cinemaman", "Coin Titan Cinemaman")
+CreateButton(Aba1, "Chief Clockman", "Chief Clockman")
+CreateButton(Aba1, "G-man 5.0 Fight", "G-man 5.0 Fight")
+
+-- Aba 2
+CreateButton(Aba2, "Scientist Tv man", "Scientist Tv man")
+CreateButton(Aba2, "Buff Huggy", "Buff Huggy")
+CreateButton(Aba2, "Chair", "Chair")
+CreateButton(Aba2, "Mace Cameraman", "Mace Cameraman")
+CreateButton(Aba2, "Vip Titan Speakerman", "Vip Titan Speakerman")
+CreateButton(Aba2, "Glitch Cameraman", "Glitch Cameraman") -- ✅ Novo botão
+
+-- Aba 3
+CreateButton(Aba3, "Evil Agent", "Evil Agent")
+CreateButton(Aba3, "Titan Clock man", "Titan Clock man")
+CreateButton(Aba3, "Titan Printer man", "Titan Printer man")
+CreateButton(Aba3, "Large Printer man", "Large Printer man")
+CreateButton(Aba3, "Printer woman", "Printer woman")
+CreateButton(Aba3, "Spider Tv", "Spider Tv")
+CreateButton(Aba3, "Vip Cameraman", "Vip Cameraman") -- ✅ Novo botão
+
+-- Ativar primeira aba por padrão
+Tabs["Aba 1"].Frame.Visible = true
+ActiveTab = "Aba 1"
+Tabs["Aba 1"].Button.BackgroundColor3 = Color3.fromRGB(80, 80, 150)
+
+-- // Animação de abrir/fechar menu
+local aberto = false
+local function AnimateMenu(open)
+    if open then
+        MainFrame.Visible = true
+        MainFrame.Size = UDim2.new(0, 340, 0, 0)
+        MainFrame.Transparency = 1
+
+        local tween1 = TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Size = UDim2.new(0, 340, 0, 350)})
+        local tween2 = TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Transparency = 0})
+
+        tween1:Play()
+        tween2:Play()
+    else
+        local tween1 = TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 340, 0, 0)})
+        local tween2 = TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Transparency = 1})
+
+        tween1:Play()
+        tween2:Play()
+        tween1.Completed:Connect(function()
+            MainFrame.Visible = false
+        end)
+    end
+end
+
+ToggleButton.MouseButton1Click:Connect(function()
+    aberto = not aberto
+    AnimateMenu(aberto)
+    ToggleButton.Text = aberto and "📂 Fechar Menu" or "📂 Abrir Menu"
+end)
+
+-- // Sistema de Drag para MainFrame
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    MainFrame.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
+end
+
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+MainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)

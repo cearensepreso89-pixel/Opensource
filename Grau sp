@@ -1,0 +1,144 @@
+-- // Serviços
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+
+-- // Criar ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "CarMenu"
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+-- // Criar Frame Principal (Menu)
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 250, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -125, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+-- // UICorner para deixar arredondado
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 10)
+Corner.Parent = MainFrame
+
+-- // Criar botão de abrir/fechar
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 120, 0, 40)
+ToggleButton.Position = UDim2.new(0.5, -60, 0, 10)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+ToggleButton.Text = "Abrir Menu"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 16
+ToggleButton.Parent = ScreenGui
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(0, 8)
+ToggleCorner.Parent = ToggleButton
+
+-- // Aba Container
+local TabContainer = Instance.new("Frame")
+TabContainer.Size = UDim2.new(1, 0, 0, 40)
+TabContainer.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+TabContainer.Parent = MainFrame
+
+local TabCorner = Instance.new("UICorner")
+TabCorner.CornerRadius = UDim.new(0, 10)
+TabCorner.Parent = TabContainer
+
+-- // Botões de Abas
+local MagnataTab = Instance.new("TextButton")
+MagnataTab.Size = UDim2.new(0.5, 0, 1, 0)
+MagnataTab.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+MagnataTab.Text = "Magnata"
+MagnataTab.TextColor3 = Color3.new(1, 1, 1)
+MagnataTab.Parent = TabContainer
+
+local PoliciaTab = Instance.new("TextButton")
+PoliciaTab.Size = UDim2.new(0.5, 0, 1, 0)
+PoliciaTab.Position = UDim2.new(0.5, 0, 0, 0)
+PoliciaTab.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+PoliciaTab.Text = "Polícia"
+PoliciaTab.TextColor3 = Color3.new(1, 1, 1)
+PoliciaTab.Parent = TabContainer
+
+-- // Containers de Opções
+local MagnataFrame = Instance.new("Frame")
+MagnataFrame.Size = UDim2.new(1, 0, 1, -40)
+MagnataFrame.Position = UDim2.new(0, 0, 0, 40)
+MagnataFrame.BackgroundTransparency = 1
+MagnataFrame.Parent = MainFrame
+
+local PoliciaFrame = MagnataFrame:Clone()
+PoliciaFrame.Parent = MainFrame
+PoliciaFrame.Visible = false
+
+-- // Função para criar botões de spawn
+local function CreateButton(parent, text, carName)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(1, -20, 0, 30)
+    Button.Position = UDim2.new(0, 10, 0, #parent:GetChildren() * 35)
+    Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    Button.TextColor3 = Color3.new(1, 1, 1)
+    Button.TextSize = 14
+    Button.Text = text
+    Button.Parent = parent
+
+    local BtnCorner = Instance.new("UICorner")
+    BtnCorner.CornerRadius = UDim.new(0, 6)
+    BtnCorner.Parent = Button
+
+    Button.MouseButton1Click:Connect(function()
+        local args = {carName}
+        ReplicatedStorage:WaitForChild("SpawnCar"):FireServer(unpack(args))
+    end)
+end
+
+-- // Criar botões Magnata
+CreateButton(MagnataFrame, "911 BEM", "911 BEM")
+CreateButton(MagnataFrame, "F900XR BEM", "F900XR BEM")
+CreateButton(MagnataFrame, "G63 BEM", "G63 BEM")
+CreateButton(MagnataFrame, "Heli BEM", "Heli BEM")
+CreateButton(MagnataFrame, "NX500 BEM", "NX500 BEM")
+CreateButton(MagnataFrame, "R1300 BEM", "R1300 BEM")
+CreateButton(MagnataFrame, "Rocket 2500 BEM", "Rocket 2500 BEM")
+CreateButton(MagnataFrame, "Tracer Lemao BEM", "Tracer Lemao BEM")
+
+-- // Criar botões Polícia
+CreateButton(PoliciaFrame, "Aguía PACKPOLICIA", "Aguía PACKPOLICIA")
+CreateButton(PoliciaFrame, "Meiota PACKPOLICIA", "Meiota PACKPOLICIA")
+
+-- // Alternar abas
+MagnataTab.MouseButton1Click:Connect(function()
+    MagnataFrame.Visible = true
+    PoliciaFrame.Visible = false
+    MagnataTab.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    PoliciaTab.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+end)
+
+PoliciaTab.MouseButton1Click:Connect(function()
+    MagnataFrame.Visible = false
+    PoliciaFrame.Visible = true
+    PoliciaTab.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    MagnataTab.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+end)
+
+-- // Função de abrir/fechar com tween
+ToggleButton.MouseButton1Click:Connect(function()
+    if MainFrame.Visible then
+        TweenService:Create(MainFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 0, 0, 0)}):Play()
+        task.wait(0.3)
+        MainFrame.Visible = false
+        ToggleButton.Text = "Abrir Menu"
+    else
+        MainFrame.Visible = true
+        MainFrame.Size = UDim2.new(0, 0, 0, 0)
+        TweenService:Create(MainFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 250, 0, 300)}):Play()
+        ToggleButton.Text = "Fechar Menu"
+    end
+end)
